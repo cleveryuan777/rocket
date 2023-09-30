@@ -32,6 +32,8 @@ namespace rocket
 
         void addTimerEvent(TimerEvent::s_ptr event);
 
+    public:
+        static  EventLoop* GetCurrentEventLoop();
     private:
         void dealWakeup();
         void initWakeUpFdEvent();

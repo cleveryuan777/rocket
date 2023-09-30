@@ -47,6 +47,11 @@ namespace rocket
     {
     }
 
+    int TcpAcceptor::getListenFd()
+    {
+        return m_listenfd;
+    }
+
     int TcpAcceptor::accept()
     {
         if (m_family == AF_INET)
@@ -55,18 +60,20 @@ namespace rocket
             memset(&clien_addr, 0, sizeof(clien_addr));
             socklen_t clien_addr_len = sizeof(clien_addr);
 
-            int clien_fd = ::accept(m_listenfd, reinterpret_cast<sockaddr *>(&m_local_addr), &clien_addr_len);
+            int clien_fd = ::accept(m_listenfd, reinterpret_cast<sockaddr *>(&clien_addr), &clien_addr_len);
             if (clien_fd < 0)
             {
                 ERRORLOG("accept error, errno = %d, error = %s", strerror(errno));
             }
             IPNetAddr peer_addr(clien_addr);
-            INFOLOG("A client have accpeted succ, peer addr [%s]", peer_addr.toString());
+            INFOLOG("A client have accpeted succ, peer addr [%s]", peer_addr.toString().c_str());
             return clien_fd;
         }
         else
         {
             // ....
+            return -1;
         }
     }
+
 } // namespace rocket

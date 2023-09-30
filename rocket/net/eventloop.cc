@@ -107,7 +107,8 @@ namespace rocket
             m_wakeup_fd_event = nullptr;
             m_wakeup_fd = -1;
         }
-        if(m_timer) {
+        if (m_timer)
+        {
             delete m_timer;
             m_timer = nullptr;
         }
@@ -221,5 +222,14 @@ namespace rocket
     bool EventLoop::isInLoopThread()
     {
         return getThreadId() == m_thread_id;
+    }
+
+    EventLoop *EventLoop::GetCurrentEventLoop()
+    {
+        if (!t_current_eventloop)
+        {
+            t_current_eventloop = new EventLoop();
+        }
+        return t_current_eventloop;
     }
 }

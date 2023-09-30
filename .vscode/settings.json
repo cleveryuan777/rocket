@@ -46,6 +46,9 @@
         "ratio": "cpp",
         "mutex": "cpp",
         "thread": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "set": "cpp"
     }
 }

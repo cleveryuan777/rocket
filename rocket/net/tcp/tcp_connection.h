@@ -4,7 +4,10 @@
 #include "rocket/net/tcp/net_addr.h"
 #include "rocket/net/tcp/tcp_buffer.h"
 #include "rocket/net/io_thread.h"
+#include "rocket/net/abstract_coder.h"
+#include "rocket/net/abstract_protocol.h"
 #include <memory>
+#include <queue>
 
 namespace rocket
 {
@@ -38,13 +41,19 @@ namespace rocket
 
         FdEvent *m_fd_event{nullptr};
 
+        AbstractCoder *m_coder{nullptr};
+
         TcpState m_state;
         int m_fd{0};
 
         TcpConnectionType m_connection_type{TcpConnectionByServer};
+        // key = AbstractProtocol.m_req_id
+        std::vector<std::pair<AbstractProtocol::s_ptr, std::function<void(AbstractProtocol::s_ptr)>>> m_write_dones;
+        // key 为req_id
+        std::map<std::string, std::function<void(AbstractProtocol::s_ptr)>> m_read_dones;
 
     public:
-        TcpConnection(EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr);
+        TcpConnection(EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr, TcpConnectionType type = TcpConnectionByServer);
         ~TcpConnection();
 
         void setState(const TcpState state);
@@ -56,6 +65,13 @@ namespace rocket
         void shutdown();
 
         void setConnectionType(TcpConnectionType type);
+        // 启动监听可写事件
+        void listenWrite();
+        // 启动监听可读事件
+        void listenRead();
+
+        void pushSendMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done);
+        void pushReadMessage(const std::string &req_id, std::function<void(AbstractProtocol::s_ptr)> done);
 
         void onRead();
 

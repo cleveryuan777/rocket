@@ -17,13 +17,19 @@ namespace rocket
         Closed = 4,
     };
 
+    enum TcpConnectionType
+    {
+        TcpConnectionByServer = 1, // 作为服务端使用，代表跟对端客户端的连接
+        TcpConnectionByClient = 2, // 作为客户端使用，代表跟对端服务端的连接
+    };
+
     class TcpConnection
     {
     public:
         typedef std::shared_ptr<TcpConnection> s_ptr;
 
     private:
-        IOThread *m_io_thread{nullptr}; // 代表持有该连接的 IO 线程
+        EventLoop *m_event_loop{nullptr}; // 代表持有该连接的 IO 线程
         NetAddr::s_ptr m_local_addr;
         NetAddr::s_ptr m_peer_addr;
 
@@ -35,8 +41,10 @@ namespace rocket
         TcpState m_state;
         int m_fd{0};
 
+        TcpConnectionType m_connection_type{TcpConnectionByServer};
+
     public:
-        TcpConnection(IOThread *io_thread, int fd, int buffer_size, NetAddr::s_ptr peer_addr);
+        TcpConnection(EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr);
         ~TcpConnection();
 
         void setState(const TcpState state);
@@ -46,6 +54,8 @@ namespace rocket
         void clear();
         // 服务器主动关闭连接
         void shutdown();
+
+        void setConnectionType(TcpConnectionType type);
 
         void onRead();
 

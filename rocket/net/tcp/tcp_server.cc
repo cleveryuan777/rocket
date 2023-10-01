@@ -55,9 +55,9 @@ namespace rocket
         // 把clien_fd 添加到任意 IO 线程里面
         IOThread *io_thread = m_io_thread_group->getIOThread();
 
-        TcpConnection::s_ptr connection = std::make_shared<TcpConnection>(io_thread, clien_fd, 128, peer_addr);
+        TcpConnection::s_ptr connection = std::make_shared<TcpConnection>(io_thread->getEventLoop(), clien_fd, 128, peer_addr);
         connection->setState(Connected);
-        m_client.insert(connection);
+        m_client.insert(connection); 
 
         INFOLOG("TcpServer succ get client , fd = %d", clien_fd);
     }

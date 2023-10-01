@@ -32,8 +32,11 @@ namespace rocket
 
         void addTimerEvent(TimerEvent::s_ptr event);
 
+        bool isLooping();
+
     public:
-        static  EventLoop* GetCurrentEventLoop();
+        static EventLoop *GetCurrentEventLoop();
+
     private:
         void dealWakeup();
         void initWakeUpFdEvent();
@@ -52,6 +55,8 @@ namespace rocket
         Mutex m_mutex;
 
         Timer *m_timer{nullptr};
+
+        bool m_is_looping{false};
     };
 
 };

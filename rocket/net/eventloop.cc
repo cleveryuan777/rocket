@@ -119,6 +119,7 @@ namespace rocket
 
     void EventLoop::loop()
     {
+        m_is_looping = true;
         while (!m_stop_flag)
         {
             ScopeMutex<Mutex> lock(m_mutex);
@@ -235,5 +236,10 @@ namespace rocket
             t_current_eventloop = new EventLoop();
         }
         return t_current_eventloop;
+    }
+
+    bool EventLoop::isLooping()
+    {
+        return m_is_looping;
     }
 }

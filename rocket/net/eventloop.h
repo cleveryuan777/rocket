@@ -48,7 +48,7 @@ namespace rocket
 
         std::set<int> m_listen_fds;
 
-        std::queue<std::function<void()>> m_pending_taks;
+        std::queue<std::function<void()>> m_pending_tasks;
         Mutex m_mutex;
 
         Timer *m_timer{nullptr};

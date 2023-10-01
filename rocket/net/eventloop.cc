@@ -14,16 +14,18 @@
         op = EPOLL_CTL_MOD;                                                                                               \
     }                                                                                                                     \
     epoll_event tmp = event->getEpollEvent();                                                                             \
+    INFOLOG("epoll_event.events = %d", (int)tmp.events);                                                                  \
     int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                                                             \
     if (rt == -1)                                                                                                         \
     {                                                                                                                     \
         ERRORLOG("failed epoll_ctl when add fd %d, errno = %d, error info = %s", event->getFd(), errno, strerror(errno)); \
     }                                                                                                                     \
+    m_listen_fds.insert(event->getFd());                                                                                  \
     DEBUGLOG("add fd succ, fd[%d]", event->getFd());
 
 #define DELETE_TO_EPOLL()                                                                                                 \
     auto it = m_listen_fds.find(event->getFd());                                                                          \
-    if (it != m_listen_fds.end())                                                                                         \
+    if (it == m_listen_fds.end())                                                                                         \
     {                                                                                                                     \
         return;                                                                                                           \
     }                                                                                                                     \
@@ -34,6 +36,7 @@
     {                                                                                                                     \
         ERRORLOG("failed epoll_ctl when del fd %d, errno = %d, error info = %s", event->getFd(), errno, strerror(errno)); \
     }                                                                                                                     \
+    m_listen_fds.erase(event->getFd());                                                                                   \
     DEBUGLOG("del fd succ, fd[%d]", event->getFd());
 
 namespace rocket
@@ -120,7 +123,7 @@ namespace rocket
         {
             ScopeMutex<Mutex> lock(m_mutex);
             std::queue<std::function<void()>> tmp_tasks;
-            m_pending_taks.swap(tmp_tasks);
+            m_pending_tasks.swap(tmp_tasks);
             lock.unlock();
 
             while (!tmp_tasks.empty())
@@ -150,6 +153,7 @@ namespace rocket
                     FdEvent *fd_event = static_cast<FdEvent *>(trigger_event.data.ptr);
                     if (fd_event == NULL)
                     {
+                        ERRORLOG("fd_event = NULL, continue");
                         continue;
                     }
                     if (trigger_event.events & EPOLLIN)
@@ -211,7 +215,7 @@ namespace rocket
     void EventLoop::addTask(std::function<void()> cb, bool is_wake_up /*=false*/)
     {
         ScopeMutex<Mutex> lock(m_mutex);
-        m_pending_taks.push(cb);
+        m_pending_tasks.push(cb);
         lock.unlock();
         if (is_wake_up)
         {

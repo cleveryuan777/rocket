@@ -1,5 +1,5 @@
-#ifndef ROCKET_FDEVENT_H_
-#define ROCKET_FDEVENT_H_
+#ifndef ROCKET_NET_FDEVENT_H_
+#define ROCKET_NET_FDEVENT_H_
 
 #include <functional>
 #include <sys/epoll.h>
@@ -9,8 +9,8 @@ namespace rocket
     class FdEvent
     {
     public:
-
-        enum TriggerEvent {
+        enum TriggerEvent
+        {
             IN_EVENT = EPOLLIN,
             OUT_EVENT = EPOLLOUT,
         };
@@ -20,15 +20,22 @@ namespace rocket
 
         ~FdEvent();
 
+        void setNonBlock();
+
         std::function<void()> handler(TriggerEvent event_type);
 
         void listen(TriggerEvent event_type, std::function<void()> callback);
 
-        int getFd() const {
+        // 取消监听
+        void cancle(TriggerEvent event_type);
+
+        int getFd() const
+        {
             return m_fd;
         }
 
-        epoll_event getEpollEvent() {
+        epoll_event getEpollEvent()
+        {
             return m_listen_events;
         }
 

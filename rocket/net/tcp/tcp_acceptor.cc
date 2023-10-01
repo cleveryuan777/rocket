@@ -52,7 +52,7 @@ namespace rocket
         return m_listenfd;
     }
 
-    int TcpAcceptor::accept()
+    std::pair<int, NetAddr::s_ptr> TcpAcceptor::accept()
     {
         if (m_family == AF_INET)
         {
@@ -65,14 +65,14 @@ namespace rocket
             {
                 ERRORLOG("accept error, errno = %d, error = %s", strerror(errno));
             }
-            IPNetAddr peer_addr(clien_addr);
-            INFOLOG("A client have accpeted succ, peer addr [%s]", peer_addr.toString().c_str());
-            return clien_fd;
+            IPNetAddr::s_ptr peer_addr = std::make_shared<IPNetAddr>(clien_addr);
+            INFOLOG("A client have accpeted succ, peer addr [%s]", peer_addr->toString().c_str());
+            return std::make_pair(clien_fd, peer_addr);
         }
         else
         {
             // ....
-            return -1;
+            return std::make_pair(-1, nullptr);
         }
     }
 

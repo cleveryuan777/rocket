@@ -5,6 +5,8 @@
 #include "rocket/net/tcp/net_addr.h"
 #include "rocket/net/eventloop.h"
 #include "rocket/net/io_thread_group.h"
+#include "rocket/net/tcp/tcp_connection.h"
+#include <set>
 
 namespace rocket
 {
@@ -22,6 +24,8 @@ namespace rocket
         FdEvent *m_listen_fd_event;
 
         int m_clien_count{0};
+
+        std::set<TcpConnection::s_ptr> m_client;
 
     public:
         TcpServer(NetAddr::s_ptr local_addr);

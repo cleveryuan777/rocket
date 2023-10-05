@@ -49,6 +49,8 @@
         "cinttypes": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "cstring": "cpp",
+        "unordered_set": "cpp"
     }
 }

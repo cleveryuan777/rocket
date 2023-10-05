@@ -33,6 +33,7 @@ void test_io_thread()
     if (rt != 0)
     {
         ERRORLOG("bind error");
+        close(listenfd);
         exit(1);
     }
 

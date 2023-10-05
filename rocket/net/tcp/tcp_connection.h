@@ -6,6 +6,7 @@
 #include "rocket/net/io_thread.h"
 #include "rocket/net/coder/abstract_coder.h"
 #include "rocket/net/coder/abstract_protocol.h"
+#include "rocket/net/rpc/rpc_dispatcher.h"
 #include <memory>
 #include <queue>
 
@@ -52,8 +53,10 @@ namespace rocket
         // key 为req_id
         std::map<std::string, std::function<void(AbstractProtocol::s_ptr)>> m_read_dones;
 
+        
+
     public:
-        TcpConnection(EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr, TcpConnectionType type = TcpConnectionByServer);
+        TcpConnection(EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr, NetAddr::s_ptr local_addr, TcpConnectionType type = TcpConnectionByServer);
         ~TcpConnection();
 
         void setState(const TcpState state);
@@ -78,6 +81,9 @@ namespace rocket
         void excute();
 
         void onWrite();
+
+        NetAddr::s_ptr getLocalAddr();
+        NetAddr::s_ptr getPeerAddr();
     };
 
 } // namespace rocket

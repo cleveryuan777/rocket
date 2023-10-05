@@ -135,7 +135,7 @@ namespace rocket
                 char error_info[512] = {0};
                 memcpy(&error_info[0], &tmp[err_info_index], message->m_err_info_len);
                 message->m_err_info = std::string(error_info);
-                DEBUGLOG("parse error_info=%s", message->m_err_info.c_str());
+                DEBUGLOG("parse error_info=[%s]", message->m_err_info.c_str());
 
                 int pb_data_len = message->m_pk_len - message->m_method_name_len - message->m_req_id_len - message->m_err_info_len - 2 - 24;
 

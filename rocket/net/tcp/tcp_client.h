@@ -32,7 +32,7 @@ namespace rocket
 
         // 异步的读取message
         // 如果读取message 成功，会调用done，函数的入参就是message对象
-        void readMessage(const std::string& req_id, std::function<void(AbstractProtocol::s_ptr)> done);
+        void readMessage(const std::string& msg_id, std::function<void(AbstractProtocol::s_ptr)> done);
     };
 
 

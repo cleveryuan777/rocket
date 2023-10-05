@@ -48,9 +48,9 @@ namespace rocket
         int m_fd{0};
 
         TcpConnectionType m_connection_type{TcpConnectionByServer};
-        // key = AbstractProtocol.m_req_id
+        // key = AbstractProtocol.m_msg_id
         std::vector<std::pair<AbstractProtocol::s_ptr, std::function<void(AbstractProtocol::s_ptr)>>> m_write_dones;
-        // key 为req_id
+        // key 为msg_id
         std::map<std::string, std::function<void(AbstractProtocol::s_ptr)>> m_read_dones;
 
         
@@ -74,7 +74,7 @@ namespace rocket
         void listenRead();
 
         void pushSendMessage(AbstractProtocol::s_ptr message, std::function<void(AbstractProtocol::s_ptr)> done);
-        void pushReadMessage(const std::string &req_id, std::function<void(AbstractProtocol::s_ptr)> done);
+        void pushReadMessage(const std::string &msg_id, std::function<void(AbstractProtocol::s_ptr)> done);
 
         void onRead();
 

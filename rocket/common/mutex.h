@@ -63,6 +63,11 @@ namespace rocket
             pthread_mutex_unlock(&m_mutex);
         }
 
+        pthread_mutex_t* getMutex()
+        {
+            return &m_mutex;
+        }
+
     private:
         pthread_mutex_t m_mutex;
     };

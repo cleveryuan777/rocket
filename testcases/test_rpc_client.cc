@@ -81,26 +81,26 @@ void test_rpc_channel()
     std::shared_ptr<rocket::RpcClosure> closure = std::make_shared<rocket::RpcClosure>([request, response, channel, controller]() mutable
                                                                                        {
         if(controller->GetErrorCode() == 0) {
-            INFOLOG("call rpc success, request [%s], response [%s]", request->ShortDebugString().c_str(), response->ShortDebugString().c_str());
+            APPINFOLOG("call rpc success, request [%s], response [%s]", request->ShortDebugString().c_str(), response->ShortDebugString().c_str());
         }else {
-            ERRORLOG("call rpc failed , request [%s], error code [%d], error info [%s]", 
+            APPERRORLOG("call rpc failed , request [%s], error code [%d], error info [%s]", 
                 request->ShortDebugString().c_str(), 
                 controller->GetErrorCode(), 
                 controller->GetErrorInfo().c_str());
         }
-        INFOLOG("now exit eventloop");
+        APPINFOLOG("now exit eventloop");
         channel->getTcpClient()->stop();
-        channel.reset(); });
+        channel.reset(); 
+        
+        });
 
     CALLRPRC("127.0.0.1:12345", makeOrder, controller, request, response, closure);
 }
 
 int main()
 {
-    rocket::Config::SetGlobalConfig("../conf/rocket.xml");
-    rocket::Logger::InitGlobalLogger();
-
-    // test_tcp_client();
+    rocket::Config::SetGlobalConfig(NULL);
+    rocket::Logger::InitGlobalLogger(0);
     test_rpc_channel();
 
     return 0;

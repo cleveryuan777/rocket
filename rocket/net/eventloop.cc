@@ -167,6 +167,15 @@ namespace rocket
                         DEBUGLOG("fd %d, trigger EPOLLOUT event", fd_event->getFd());
                         addTask(fd_event->handler(FdEvent::OUT_EVENT));
                     }
+                    if (trigger_event.events & EPOLLERR)
+                    {
+                        DEBUGLOG("fd %d, trigger ERROREVENT event", fd_event->getFd());
+                        deleteEpollEvent(fd_event);
+                        if (fd_event->handler(FdEvent::IN_EVENT) != nullptr)
+                        {
+                            addTask(fd_event->handler(FdEvent::IN_EVENT));
+                        }
+                    }
                 }
             }
         }

@@ -63,15 +63,25 @@ namespace rocket
         s_ptr channel = shared_from_this();
 
         m_client->connect([req_protocl, channel]() mutable{
-            channel->getTcpClient()->writeMessage(req_protocl, [req_protocl, channel](AbstractProtocol::s_ptr) mutable{
-                INFOLOG("%s |, send rpc request success. call method name [%s], origin request", 
-                    req_protocl->m_msg_id.c_str(), req_protocl->m_method_name.c_str())
-                channel->getTcpClient()->readMessage(req_protocl->m_msg_id, [channel](AbstractProtocol::s_ptr msg) mutable{
-                    std::shared_ptr<rocket::TinyPBProtocol> rsp_protocol = std::dynamic_pointer_cast<rocket::TinyPBProtocol>(msg);
-                    INFOLOG("[%s] | success get rpc reponse, method name [%s]", 
-                        rsp_protocol->m_msg_id.c_str(), rsp_protocol->m_method_name.c_str());
+            RpcController *my_controller = dynamic_cast<RpcController *>(channel->getController());
 
-                    RpcController *my_controller = dynamic_cast<RpcController *>(channel->getController());
+            if(channel->getTcpClient()->getConnectErrorCode() != 0) {
+                my_controller->SetError(channel->getTcpClient()->getConnectErrorCode(), channel->getTcpClient()->getConnectErrorInfo());
+                ERRORLOG("%s | connect error, error code [%d], error info [%s], peer addr [%s]",
+                req_protocl->m_method_name.c_str(), my_controller->GetErrorCode(), 
+                my_controller->GetErrorInfo().c_str(), channel->getTcpClient()->getPeerAddr()->toString().c_str());
+                return;
+            }
+
+            channel->getTcpClient()->writeMessage(req_protocl, [req_protocl, channel, my_controller](AbstractProtocol::s_ptr) mutable{
+                INFOLOG("%s |, send rpc request success. call method name [%s], origin request, peer addr [%s], local addr [%s]", 
+                    req_protocl->m_msg_id.c_str(), req_protocl->m_method_name.c_str(), channel->getTcpClient()->getPeerAddr()->toString().c_str(), channel->getTcpClient()->getLocalAddr()->toString().c_str())
+                channel->getTcpClient()->readMessage(req_protocl->m_msg_id, [channel, my_controller](AbstractProtocol::s_ptr msg) mutable{
+                    std::shared_ptr<rocket::TinyPBProtocol> rsp_protocol = std::dynamic_pointer_cast<rocket::TinyPBProtocol>(msg);
+                    INFOLOG("[%s] | success get rpc reponse, method name [%s], peer addr [%s], local addr [%s]", 
+                        rsp_protocol->m_msg_id.c_str(), rsp_protocol->m_method_name.c_str(), channel->getTcpClient()->getPeerAddr()->toString().c_str(), channel->getTcpClient()->getLocalAddr()->toString().c_str());
+
+                    
                     
                     if (!(channel->getResponse()->ParseFromString(rsp_protocol->m_pb_data)))
                     {
@@ -86,6 +96,10 @@ namespace rocket
                         my_controller->SetError(rsp_protocol->m_err_code, rsp_protocol->m_err_info);
                         return;
                     }
+                    INFOLOG("%s | call rpc success call method name [%s], origin request, peer addr [%s], local addr [%s]",
+                    rsp_protocol->m_msg_id.c_str(),rsp_protocol->m_method_name.c_str(), channel->getTcpClient()->getPeerAddr()->toString().c_str(), channel->getTcpClient()->getLocalAddr()->toString().c_str() 
+                    );
+
                     if(channel->getClosure()) {
                         channel->getClosure()->Run();
                     }

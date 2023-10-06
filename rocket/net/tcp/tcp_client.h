@@ -1,6 +1,7 @@
 #ifndef ROCKET_NET_TCP_TCPCLIENT_H_
 #define ROCKET_NET_TCP_TCPCLIENT_H_
 
+#include <memory>
 #include "rocket/net/tcp/net_addr.h"
 #include "rocket/net/eventloop.h"
 #include "rocket/common/log.h"
@@ -19,6 +20,7 @@ namespace rocket
         TcpConnection::s_ptr m_connection;
 
     public:
+        typedef std::shared_ptr<TcpClient> s_ptr;
         TcpClient(NetAddr::s_ptr peer_addr);
         ~TcpClient();
 
@@ -32,10 +34,10 @@ namespace rocket
 
         // 异步的读取message
         // 如果读取message 成功，会调用done，函数的入参就是message对象
-        void readMessage(const std::string& msg_id, std::function<void(AbstractProtocol::s_ptr)> done);
+        void readMessage(const std::string &msg_id, std::function<void(AbstractProtocol::s_ptr)> done);
+
+        void stop();
     };
-
-
 
 } // namespace rocket
 

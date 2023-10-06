@@ -26,7 +26,7 @@ namespace rocket
                 ERRORLOG("read from /dev/urandom error");
                 return "";
             }
-            for (size_t i = 0; i < g_msg_id_length; i++)
+            for (int i = 0; i < g_msg_id_length; i++)
             {
                 uint8_t x = ((uint8_t)(res[i])) % 10;
                 res[i] = x + '0';
@@ -36,7 +36,7 @@ namespace rocket
         }
         else
         {
-            int i = t_msg_id_no.length() - 1;
+            size_t i = t_msg_id_no.length() - 1;
             while (t_msg_id_no[i] == '9' && i >= 0)
             {
                 i--;

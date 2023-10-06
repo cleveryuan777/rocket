@@ -13,8 +13,7 @@ namespace rocket
         std::function<void()> m_cb{nullptr};
 
     public:
-        RpcClosure(/* args */);
-        ~RpcClosure();
+        RpcClosure(std::function<void()> cb) : m_cb(cb) {}
         void Run() override
         {
             if (m_cb != nullptr)
